@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bindu
 
-## Getting Started
+A modern, minimal studio website template designed to showcase creative work, highlight services, and build a strong digital presence. Perfect for design studios, creative agencies, and independent creators.
 
-First, run the development server:
+It comes with a homepage of scattered project images, an archive you can browse three ways (board, stack and grid), and short Services and About pages. The demo content is for Bindu, a design studio in New Delhi. Swap in your own by editing the files in `content/`.
+
+Built with Next.js 16 (App Router), React 19, Tailwind CSS v4, Motion and Lenis. Every page is static, and there is no database or CMS. The content lives in TypeScript files.
+
+## Running it
+
+You need Node 20.9 or later.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things are
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+  page.tsx            homepage (scatter field)
+  work/               archive: board, stack and grid views
+  services/  about/   studio pages
+  imprint/            legal page, not indexed
+  actions/contact.ts  contact form server action
+content/
+  projects.ts         every project: title, client, year, summary, colours
+  studio.ts           services, clients, stats, team, studio photos
+  site.ts             name, address, phone, emails, nav, socials
+components/
+  archive/            the three archive views and their controls
+  overlays/           project gallery and contact form
+  home/  studio/      page-specific pieces
+lib/                  scatter layout maths, small hooks
+public/
+  work/<slug>/        01.jpg to 03.jpg per project
+  team/  studio/      people and studio photos
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Editing content
 
-## Learn More
+Most changes only touch `content/`.
 
-To learn more about Next.js, take a look at the following resources:
+**Add a project.** Add an entry to `projects` in `content/projects.ts`, then put three images in `public/work/<slug>/` named `01.jpg`, `02.jpg` and `03.jpg`. Their shapes follow the project's `ratios` array, which is `["tall", "landscape", "square"]` for every project at the moment. Tall is 768×1024, landscape 1024×768 and square 1024×1024. Other sizes still work as long as the aspect ratio matches.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Change the team.** Edit `team` in `content/studio.ts`. Photos go in `public/team/` and are shown at 3:4.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Change the address, phone or emails.** Edit `content/site.ts`. The contact overlay and imprint read from it, and the header and footer use the email and social links.
 
-## Deploy on Vercel
+## How the URLs work
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/work?view=board`, `?view=grid` or no `view` param: the stack view is the default.
+- `/work?gallery=<slug>` opens a project's gallery on top of the archive, so a gallery link can be shared.
+- Any link to `#contact` opens the contact form, on any page.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Before going live
+
+- **Contact form.** `app/actions/contact.ts` validates the form and logs it to the server console. Nothing is sent anywhere yet. Hook it up to an email service such as Resend, or to a webhook.
+- **Imprint.** `app/imprint/page.tsx` needs the registered business name, GSTIN and registered address.
+- **Phone number.** The phone number in `content/site.ts` is a placeholder.
+- **Social links.** The links in `content/site.ts` point to the bare Instagram, Behance and LinkedIn homepages.
+- **Domain.** `site.url` is used for the sitemap, robots.txt and Open Graph tags, so change it if the domain isn't `bindu.studio`.
+- **Images.** The project, team and studio images are AI-generated stand-ins. Replace them with real photography. Some of them contain small text errors.
+
+## Notes
+
+- If you replace an image but keep its filename, the dev server may keep showing the old one. Delete `.next/dev/cache/images` and reload.
+- Animations respect `prefers-reduced-motion`.
+- `AGENTS.md` is generated by `next dev` for coding agents. Leave it in place.
